@@ -1,6 +1,8 @@
 Ansible Role: GitKraken
 =======================
 
+[![Build Status](https://travis-ci.org/gantsign/ansible-role-gitkraken.svg?branch=master)](https://travis-ci.org/gantsign/ansible-role-gitkraken)
+
 Role to download and install the [GitKraken](https://www.gitkraken.com) Git client.
 
 Requirements
