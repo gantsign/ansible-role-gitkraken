@@ -15,10 +15,12 @@
     mode: 'u=rw,go=r'
 
 - name: install GitKraken dependencies
+  become: yes
   apt:
     name: gvfs-bin
     state: present
 
 - name: install GitKraken
+  become: yes
   apt:
     deb: "{{ local_ansible_data_path }}/{{ gitkraken_redis_filename }}"
