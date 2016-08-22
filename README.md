@@ -21,7 +21,7 @@ are shown below):
 gitkraken_redis_url: https://release.gitkraken.com/linux/gitkraken-amd64.deb
 
 # Directory to store files downloaded for GitKraken installation
-gitkraken_download_dir: "{{ x_ansible_download_dir | default('/tmp/ansible/data') }}"
+gitkraken_download_dir: "{{ x_ansible_download_dir | default('~/.ansible/tmp/downloads') }}"
 ```
 
 Example Playbook
