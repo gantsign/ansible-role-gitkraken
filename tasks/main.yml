@@ -1,9 +1,9 @@
 ---
-- name: create local Ansible data directory
+- name: create download directory
   file:
     state: directory
     mode: 'u=rwx,go=rx'
-    dest: "{{ local_ansible_data_path }}"
+    dest: "{{ gitkraken_download_dir }}"
 
 - name: ensure ca-certificates installed
   become: yes
@@ -14,7 +14,7 @@
 - name: download GitKraken
   get_url:
     url: "{{ gitkraken_redis_url }}"
-    dest: "{{ local_ansible_data_path }}/{{ gitkraken_redis_filename }}"
+    dest: "{{ gitkraken_download_dir }}/{{ gitkraken_redis_filename }}"
     force: false
     use_proxy: true
     validate_certs: true
@@ -29,4 +29,4 @@
 - name: install GitKraken
   become: yes
   apt:
-    deb: "{{ local_ansible_data_path }}/{{ gitkraken_redis_filename }}"
+    deb: "{{ gitkraken_download_dir }}/{{ gitkraken_redis_filename }}"

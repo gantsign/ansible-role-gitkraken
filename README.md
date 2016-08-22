@@ -20,8 +20,8 @@ are shown below):
 # The download URL for the redistributable package
 gitkraken_redis_url: https://release.gitkraken.com/linux/gitkraken-amd64.deb
 
-# Path for Ansible to store downloaded files
-local_ansible_data_path: '/tmp/ansible/data'
+# Directory to store files downloaded for GitKraken installation
+gitkraken_download_dir: "{{ x_ansible_download_dir | default('/tmp/ansible/data') }}"
 ```
 
 Example Playbook
