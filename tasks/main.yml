@@ -5,6 +5,12 @@
     mode: 'u=rwx,go=rx'
     dest: "{{ local_ansible_data_path }}"
 
+- name: ensure ca-certificates installed
+  become: yes
+  apt:
+    name: ca-certificates
+    state: present
+
 - name: download GitKraken
   get_url:
     url: "{{ gitkraken_redis_url }}"
