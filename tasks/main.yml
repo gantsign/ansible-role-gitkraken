@@ -11,14 +11,46 @@
     name: ca-certificates
     state: present
 
+- name: ensure curl installed
+  become: yes
+  apt:
+    name: curl
+    state: present
+
+- name: check latest remote GitKraken version
+  shell: |
+    head_file={{ gitkraken_download_dir }}/{{ gitkraken_redis_filename }}.head
+    curl --head {{ gitkraken_redis_url }} > $head_file
+  changed_when: no
+
+- name: compare local version
+  shell: |
+    head_file={{ gitkraken_download_dir }}/{{ gitkraken_redis_filename }}.head
+    etag_file={{ gitkraken_download_dir }}/{{ gitkraken_redis_filename }}.etag
+    [ "$(grep -i -E --color=never '^ETag:' $head_file)" = "$(cat $etag_file)" ]
+  args:
+      executable: /bin/bash
+  register: version_check
+  changed_when: no
+  failed_when: no
+
 - name: download GitKraken
   get_url:
     url: "{{ gitkraken_redis_url }}"
     dest: "{{ gitkraken_download_dir }}/{{ gitkraken_redis_filename }}"
-    force: no
+    force: "{{ version_check.rc != 0 }}"
     use_proxy: yes
     validate_certs: yes
     mode: 'u=rw,go=r'
+
+- name: update etag file
+  shell: |
+    head_file={{ gitkraken_download_dir }}/{{ gitkraken_redis_filename }}.head
+    etag_file={{ gitkraken_download_dir }}/{{ gitkraken_redis_filename }}.etag
+    grep -i -E --color=never '^ETag:' $head_file > $etag_file
+  args:
+      executable: /bin/bash
+  when: "{{ version_check.rc != 0 }}"
 
 - name: install GitKraken dependencies
   become: yes
