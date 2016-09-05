@@ -18,12 +18,20 @@
     state: present
 
 - name: check latest remote GitKraken version
+  tags:
+    # False positive: [ANSIBLE0014] Environment variables don't work as part of command
+    # Setting the environment variables in the script so they are safe to use.
+    - skip_ansible_lint
   shell: |
     head_file={{ gitkraken_download_dir }}/{{ gitkraken_redis_filename }}.head
     curl --head {{ gitkraken_redis_url }} > $head_file
   changed_when: no
 
 - name: compare local version
+  tags:
+    # False positive: [ANSIBLE0014] Environment variables don't work as part of command
+    # Setting the environment variables in the script so they are safe to use.
+    - skip_ansible_lint
   shell: |
     head_file={{ gitkraken_download_dir }}/{{ gitkraken_redis_filename }}.head
     etag_file={{ gitkraken_download_dir }}/{{ gitkraken_redis_filename }}.etag
@@ -44,6 +52,10 @@
     mode: 'u=rw,go=r'
 
 - name: update etag file
+  tags:
+    # False positive: [ANSIBLE0014] Environment variables don't work as part of command
+    # Setting the environment variables in the script so they are safe to use.
+    - skip_ansible_lint
   shell: |
     head_file={{ gitkraken_download_dir }}/{{ gitkraken_redis_filename }}.head
     etag_file={{ gitkraken_download_dir }}/{{ gitkraken_redis_filename }}.etag
