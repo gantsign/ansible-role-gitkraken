@@ -32,6 +32,7 @@
     url: '{{ gitkraken_redis_url }}'
     method: HEAD
     follow_redirects: safe
+  always_run: yes
   register: head_query
 
 - name: set latest etag fact
