@@ -3,7 +3,7 @@
   file:
     state: directory
     mode: 'u=rwx,go=rx'
-    dest: "{{ gitkraken_download_dir }}"
+    dest: '{{ gitkraken_download_dir }}'
 
 - name: ensure ca-certificates installed
   become: yes
@@ -36,9 +36,9 @@
 
 - name: download GitKraken
   get_url:
-    url: "{{ gitkraken_redis_url }}"
-    dest: "{{ gitkraken_download_dir }}/{{ gitkraken_redis_filename }}"
-    force: "{{ version_check.rc != 0 }}"
+    url: '{{ gitkraken_redis_url }}'
+    dest: '{{ gitkraken_download_dir }}/{{ gitkraken_redis_filename }}'
+    force: '{{ version_check.rc != 0 }}'
     use_proxy: yes
     validate_certs: yes
     mode: 'u=rw,go=r'
@@ -48,7 +48,7 @@
     grep -i -E --color=never '^ETag:' {{ gitkraken_head_path }} > {{ gitkraken_etag_path }}
   args:
       executable: /bin/bash
-  when: "{{ version_check.rc != 0 }}"
+  when: '{{ version_check.rc != 0 }}'
 
 - name: install GitKraken dependencies
   become: yes
@@ -59,4 +59,4 @@
 - name: install GitKraken
   become: yes
   apt:
-    deb: "{{ gitkraken_download_dir }}/{{ gitkraken_redis_filename }}"
+    deb: '{{ gitkraken_download_dir }}/{{ gitkraken_redis_filename }}'
