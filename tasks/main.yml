@@ -11,44 +11,46 @@
     name: ca-certificates
     state: present
 
-- name: ensure curl installed
-  become: yes
-  apt:
-    name: curl
-    state: present
+- name: check for etag file
+  stat:
+    path: '{{ gitkraken_etag_path }}'
+  register: etag_file_test
+
+- name: read etag file
+  slurp:
+    src: '{{ gitkraken_etag_path }}'
+  register: etag_file
+  when: etag_file_test.stat.exists
+
+- name: set existing etag fact
+  set_fact:
+    gitkraken_existing_etag: '{{ etag_file.content | b64decode }}'
+  when: etag_file_test.stat.exists
 
 - name: check latest remote GitKraken version
-  tags:
-    # Suppress: [ANSIBLE0006] curl used in place of get_url or uri module
-    - skip_ansible_lint
-  shell: |
-    curl --head {{ gitkraken_redis_url }} > {{ gitkraken_head_path }}
-  changed_when: no
+  uri:
+    url: '{{ gitkraken_redis_url }}'
+    method: HEAD
+    follow_redirects: safe
+  register: head_query
 
-- name: compare local version
-  shell: |
-    [ "$(grep -i -E --color=never '^ETag:' {{ gitkraken_head_path }})" = "$(cat {{ gitkraken_etag_path }})" ]
-  args:
-      executable: /bin/bash
-  register: version_check
-  changed_when: no
-  failed_when: no
+- name: set latest etag fact
+  set_fact:
+    gitkraken_latest_etag: '{{ head_query.etag }}'
 
 - name: download GitKraken
   get_url:
     url: '{{ gitkraken_redis_url }}'
     dest: '{{ gitkraken_download_dir }}/{{ gitkraken_redis_filename }}'
-    force: '{{ version_check.rc != 0 }}'
+    force: '{{ gitkraken_latest_etag != gitkraken_existing_etag }}'
     use_proxy: yes
     validate_certs: yes
     mode: 'u=rw,go=r'
 
 - name: update etag file
-  shell: |
-    grep -i -E --color=never '^ETag:' {{ gitkraken_head_path }} > {{ gitkraken_etag_path }}
-  args:
-      executable: /bin/bash
-  when: '{{ version_check.rc != 0 }}'
+  copy:
+    content: '{{ gitkraken_latest_etag }}'
+    dest: '{{ gitkraken_etag_path }}'
 
 - name: install GitKraken dependencies
   become: yes
